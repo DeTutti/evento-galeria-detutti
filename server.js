@@ -27,3 +27,14 @@ app.post("/upload", upload.single("foto"), async (req, res) => {
 app.listen(3000, () => {
   console.log("Servidor corriendo en puerto 3000");
 });
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Esto es necesario para obtener la ruta correcta
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Servir index.html cuando alguien entra a "/"
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
