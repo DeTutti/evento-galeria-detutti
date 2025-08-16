@@ -1,0 +1,12 @@
+{
+  "name": "evento-galeria-detutti",
+  "version": "1.0.0",
+  "description": "Página para subir y mostrar fotos en eventos",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
