@@ -1,54 +1,29 @@
-const express = require("express");
-const multer = require("multer");
-const cloudinary = require("cloudinary").v2;
-const dotenv = require("dotenv");
-
-dotenv.config();
+import express from "express";
+import { v2 as cloudinary } from "cloudinary";
+import multer from "multer";
 
 const app = express();
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ dest: "uploads/" });
 
+// Configuración de Cloudinary con variables de entorno
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET
+  api_secret: process.env.API_SECRET,
 });
 
-app.use(express.static("public"));
-
-let fotos = [];
-
-// Subir imagen
+// Ruta de prueba: subir una imagen
 app.post("/upload", upload.single("foto"), async (req, res) => {
   try {
-    const resultado = await cloudinary.uploader.upload_stream(
-      { folder: "evento" },
-      (error, result) => {
-        if (error) return res.status(500).json({ error });
-        fotos.push(result.secure_url);
-        res.redirect("/");
-      }
-    );
-    resultado.end(req.file.buffer);
-  } catch (error) {
-    res.status(500).json({ error });
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "evento-galeria",
+    });
+    res.json({ url: result.secure_url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
-// Página principal
-app.get("/", (req, res) => {
-  let html = `
-    <h1>Galería del Evento</h1>
-    <form action="/upload" method="POST" enctype="multipart/form-data">
-      <input type="file" name="foto" required />
-      <button type="submit">Subir Foto</button>
-    </form>
-    <div>
-      ${fotos.map(url => `<img src="${url}" width="200"/>`).join("")}
-    </div>
-  `;
-  res.send(html);
+app.listen(3000, () => {
+  console.log("Servidor corriendo en puerto 3000");
 });
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Servidor corriendo en puerto ${port}`));
