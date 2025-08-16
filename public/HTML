@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Subir Foto al Evento</title>
+</head>
+<body>
+  <h1>📸 Subir foto al evento</h1>
+
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="foto" accept="image/*" required />
+    <button type="submit">Subir</button>
+  </form>
+
+  <p id="mensaje"></p>
+  <img id="preview" style="max-width:300px; display:none;" />
+
+  <script>
+    const form = document.getElementById("uploadForm");
+    const mensaje = document.getElementById("mensaje");
+    const preview = document.getElementById("preview");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+
+      mensaje.textContent = "Subiendo foto...";
+      preview.style.display = "none";
+
+      try {
+        const res = await fetch("/upload", {
+          method: "POST",
+          body: data
+        });
+        const json = await res.json();
+
+        if (json.url) {
+          mensaje.textContent = "✅ Foto subida con éxito";
+          preview.src = json.url;
+          preview.style.display = "block";
+        } else {
+          mensaje.textContent = "⚠️ Error: " + (json.error || "No se pudo subir");
+        }
+      } catch (err) {
+        mensaje.textContent = "❌ Error al conectar con el servidor";
+      }
+    });
+  </script>
+</body>
+</html>
